@@ -1042,11 +1042,11 @@ class DtellaBot(object):
             f = getattr(self, 'handleCmd_' + cmd[0])
         except AttributeError:
             if prefix:
-                return False
-            else:
                 out("Unknown command '%s'.  Type %sHELP for help." %
                     (cmd[0], prefix))
                 return True
+            else:
+                return False
 
         # Filter out location-specific commands
         if not local.use_locations:
@@ -1105,6 +1105,7 @@ class DtellaBot(object):
         ("PERSISTENT", "View or toggle persistent mode"),
         ("--",         "INFORMATION"),
         ("VERSION",    "View information about your Dtella version."),
+        ("NEIGHBORS",  "Show information about your connected neighbors"),
         ("USERS",      "Show how many users exist at each location"),
         ("SHARED",     "Show how many bytes are shared at each location"),
         ("DENSE",      "Show the bytes/user density for each location"),
@@ -1165,6 +1166,12 @@ class DtellaBot(object):
             "to see whether local searching is currently enabled or not."
             ),
 
+        "NEIGHBORS":(
+            "",
+            "This will ist all connected neighbors with the format "
+            "Direction, IP, Latency, Nickname."
+            ),
+            
         "USERS":(
             "",
             "This will list all the known locations, and show how many "
@@ -1640,6 +1647,39 @@ class DtellaBot(object):
         else:
             out("%sVERSION_OVERRIDE not needed." % prefix)
 
+    def handleCmd_NEIGHBORS(self, out, text, prefix):
+        osm = self.main.osm
+        if not osm:
+            return
+
+        out("Neighbors:")
+        
+        for pn in osm.pgm.pnbs.itervalues():
+            info = []
+            
+            if pn.outbound and pn.inbound:
+                info.append("<->")
+            elif pn.outbound:
+                info.append("-->")
+            elif pn.inbound:
+                info.append("<--")
+
+            myIP,myPort = struct.unpack('>LH', pn.ipp)
+            info.append("%16s:%-5d" % (socket.inet_ntoa(struct.pack('!L', myIP)), myPort))
+            
+            if pn.avg_ping is not None:
+                delay = pn.avg_ping * 1000.0
+            else:
+                delay = 0.0
+            info.append("%7.1fms" % delay)
+            
+            try:
+                nick = osm.lookup_ipp[pn.ipp].nick
+            except KeyError:
+                nick = ""
+            info.append("%s" % nick)
+
+            out(' '.join(info))
 
     def handleCmd_DEBUG(self, out, text, prefix):
 
@@ -1691,7 +1731,9 @@ class DtellaBot(object):
             elif pn.inbound:
                 info.append("<--")
 
-            info.append(binascii.hexlify(pn.ipp).upper())
+            #info.append(binascii.hexlify(pn.ipp).upper())
+            myIP,myPort = struct.unpack('>LH', pn.ipp)
+            info.append("%s:%d" % (socket.inet_ntoa(struct.pack('!L', myIP)), myPort))
 
             if pn.avg_ping is not None:
                 delay = pn.avg_ping * 1000.0
@@ -1725,7 +1767,9 @@ class DtellaBot(object):
 
         for n in ([me] + osm.nodes):
             info = []
-            info.append(binascii.hexlify(n.ipp).upper())
+            #info.append(binascii.hexlify(n.ipp).upper())
+            myIP,myPort = struct.unpack('>LH', n.ipp)
+            info.append("%s:%d" % (socket.inet_ntoa(struct.pack('!L', myIP)), myPort))
 
             if n.ipp in osm.pgm.pnbs:
                 info.append("Y")

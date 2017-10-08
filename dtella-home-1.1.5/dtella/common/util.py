@@ -180,7 +180,7 @@ def get_version_string():
 
 
 def get_user_path(filename):
-    path = os.path.expanduser("~/.dtella")
+    path = "/data/"
     if path[:1] == '~':
         # Can't get a user directory, just save to cwd.
         return filename

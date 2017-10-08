@@ -35,6 +35,7 @@ if __name__ == '__main__':
 
 # Patch the twisted bugs before doing anything else.
 import dtella.common.fix_twisted
+import dtella.local_config as local
 
 import twisted.internet.error
 import twisted.python.log
@@ -43,6 +44,7 @@ import sys
 import socket
 import time
 import getopt
+import os
 
 from dtella.common.log import setLogFile
 from dtella.common.log import LOG
@@ -132,8 +134,8 @@ def runClient(dc_port):
             else:
                 LOG.error("Bind failed again.  Giving up.")
                 reactor.stop()
-        else:
             LOG.info("Listening on 127.0.0.1:%d" % dc_port)
+        else:
             dtMain.startConnecting()
 
     reactor.callWhenRunning(cb, True)
@@ -198,7 +200,7 @@ def main():
         return
 
     # User-specified TCP port
-    dc_port = 6473
+    dc_port = 27999
     if '--port' in opts:
         try:
             dc_port = int(opts['--port'])
@@ -216,7 +218,16 @@ def main():
             time.sleep(2.0)
         print "Done."
         return
-
+    
+    
+    if os.environ.get('NETWORK_KEY') is not None:
+        local.network_key = os.environ.get('NETWORK_KEY')
+    if os.environ.get('NETWORK_NAME') is not None:
+        local.hub_name = os.environ.get('NETWORK_NAME')
+    
+    LOG.info("Network Name = %s" % local.hub_name)
+    LOG.info("Network Key = %s" % local.network_key)
+    
     runClient(dc_port)
 
 

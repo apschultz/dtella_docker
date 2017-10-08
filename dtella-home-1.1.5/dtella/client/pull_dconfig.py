@@ -64,6 +64,12 @@ class DynamicConfigPuller(object):
     def getDynamicConfig(self, cb):
         # Requery the config if we haven't gotten an update in the
         # last hour.
+        
+        if local.dconfig_puller is None:
+            if cb:
+                self.cfg_cb = cb
+                self.doCallback()
+            return;
 
         stale = ((self.cfg_lastUpdate is None) or
                  (seconds() - self.cfg_lastUpdate >= 60*5))

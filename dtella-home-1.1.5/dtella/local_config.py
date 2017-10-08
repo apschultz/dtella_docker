@@ -29,12 +29,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 build_prefix = "dtella-home-"
 
 # Dtella version number.
-version = "1.1.5"
+version = "1.1.5-docker"
 
 # This is an arbitrary string which is used for encrypting packets.
 # It essentially defines the uniqueness of a Dtella network, so every
 # network should have its own unique key.
-network_key = 'DtellaHome-696969'
+network_key = 'dlRNFXPu3lRoSQkmnMN5CTwGImVUAhWjI6HkbfZTtJoIo5h9RQCf10nYOzYkrxb2'
 
 # This is the name of the "hub" which is seen by the user's DC client.
 # "Dtella@____" is the de-facto standard, but nobody's stopping you
@@ -67,10 +67,12 @@ allowed_subnets = ['0.0.0.0/1', '128.0.0.0/1']
 ##    )
 
 # -- Use Google Spreadsheet --
-import dtella.modules.pull_gdata
-dconfig_puller = dtella.modules.pull_gdata.GDataPuller(
-    sheet_key = "pcH4hIHGSUc3yP2yhp2e8Tg"
-    )
+#import dtella.modules.pull_gdata
+#dconfig_puller = dtella.modules.pull_gdata.GDataPuller(
+#    sheet_key = "none"
+#    )
+
+dconfig_puller = None
 
 # Enable this if you can devise a meaningful mapping from a user's hostname
 # to their location.  Locations are displayed in the "Connection / Speed"

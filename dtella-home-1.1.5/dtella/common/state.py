@@ -307,10 +307,8 @@ class UDPPort(LoadSaver):
             state.udp_port = self.unpackValue(d, 'H')
             
         except StateError:
-            # Pick a random UDP port to use.  Try a few times.
+            state.udp_port = 27998 #start with preferred port
             for i in range(8):
-                state.udp_port = random.randint(1024, 65535)
-                
                 try:
                     # See if the randomly-selected port is available
                     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -318,8 +316,9 @@ class UDPPort(LoadSaver):
                     s.close()
                     break
                 except socket.error:
+                    # Pick a random UDP port to use to try next
+                    state.udp_port = random.randint(1024, 65535)
                     pass
-
 
     def save(self, state, d):
         self.packValue(d, 'H', state.udp_port)

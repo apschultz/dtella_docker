@@ -36,11 +36,11 @@ RUN ln -s -f /bin/true /usr/bin/chfn
 
 # Install required tools
 RUN apt-get -q update && apt-get install -qy gcc && \
+    pip install -v twisted PyCrypto dnspython gdata && \
+    apt-get -y purge gcc && \
     apt-get -y clean && apt-get -y autoclean && apt-get -y autoremove
 
-# Install Dtella requirements
-RUN pip install -v twisted PyCrypto dnspython gdata
-
+# Debug tools
 #RUN apt-get -q update && apt-get install -qy net-tools tcpdump nano telnet && \
 #    apt-get -y clean && apt-get -y autoclean && apt-get -y autoremove
 
